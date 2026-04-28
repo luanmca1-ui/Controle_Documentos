@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Documentos — The Barber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0c0d0f;
+  --surface:#141618;
+  --surface-2:#1c1e22;
+  --border:#26282e;
+  --border-2:#32353d;
+  --gold:#c9a84c;
+  --gold-dim:#6e5c27;
+  --gold-bg:rgba(201,168,76,.07);
+  --gold-bg2:rgba(201,168,76,.13);
+  --text:#dde0e6;
+  --text-muted:#6b7080;
+  --text-dim:#8d94a6;
+  --success:#3ab87a;
+  --error:#e05656;
+  --r:10px;
+}
+
+html,body{height:100%}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Outfit',sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:52px 16px 80px;
+}
+
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(201,168,76,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(201,168,76,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
+.wrap{position:relative;z-index:1;width:100%;max-width:600px}
+
+/* ——— HEADER ——— */
+header{text-align:center;margin-bottom:44px}
+
+.pill{
+  display:inline-flex;align-items:center;gap:9px;
+  margin-bottom:16px;padding:5px 16px;
+  border:1px solid var(--gold-dim);border-radius:100px;
+  background:var(--gold-bg);
+}
+
+.pill svg{width:13px;height:13px;fill:none;stroke:var(--gold);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pill span{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600}
+
+h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.8rem;letter-spacing:3px;
+  color:var(--text);line-height:1;margin-bottom:10px;
+}
+
+header p{font-size:.84rem;color:var(--text-muted)}
+
+/* ——— CARD ——— */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:32px;
+}
+
+/* ——— SECTION LABEL ——— */
+.slabel{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:18px;
+  font-size:.67rem;font-weight:600;
+  letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);
+}
+.slabel::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.sep{border:none;border-top:1px solid var(--border);margin:26px 0}
+
+/* ——— FIELDS ——— */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.77rem;color:var(--text-dim);margin-bottom:7px;font-weight:500}
+
+.sw{position:relative}
+.sw::after{
+  content:'';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:0;height:0;
+  border-left:4px solid transparent;border-right:4px solid transparent;
+  border-top:5px solid var(--text-muted);pointer-events:none;
+}
+
+select,input[type=text]{
+  width:100%;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  color:var(--text);
+  font-family:'Outfit',sans-serif;
+  font-size:.9rem;
+  padding:11px 14px;
+  outline:none;
+  transition:border-color .15s;
+  appearance:none;-webkit-appearance:none;
+}
+select{padding-right:36px}
+select:focus,input:focus{border-color:var(--gold)}
+select option{background:#1c1e22}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ——— DROP ZONE ——— */
+.dz{
+  border:1.5px dashed var(--border-2);
+  border-radius:var(--r);
+  padding:28px 20px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .15s;
+  position:relative;
+  background:var(--surface-2);
+}
+.dz:hover,.dz.over{border-color:var(--gold);background:var(--gold-bg)}
+.dz.filled{border-style:solid;border-color:var(--gold);background:var(--gold-bg)}
+.dz input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+
+.dz-icon{font-size:1.7rem;margin-bottom:8px;display:block;transition:transform .2s}
+.dz:hover .dz-icon{transform:scale(1.1)}
+
+.dz-text{font-size:.84rem;color:var(--text-muted);line-height:1.6}
+.dz-text em{color:var(--gold);font-style:normal;font-weight:500}
+.dz-hint{font-size:.72rem;color:#484c58;margin-top:4px;display:block}
+
+.finfo{
+  display:none;align-items:center;gap:10px;
+  margin-top:10px;padding:9px 13px;
+  background:var(--gold-bg2);
+  border:1px solid var(--gold-dim);
+  border-radius:8px;
+}
+.finfo.vis{display:flex}
+.finfo-name{font-size:.82rem;color:var(--gold);font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.finfo-rm{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.95rem;padding:0 4px;transition:color .12s;line-height:1}
+.finfo-rm:hover{color:var(--error)}
+
+/* ——— PREVIEW ——— */
+.prow{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.prow-l{font-size:.77rem;color:var(--text-dim);font-weight:500}
+.prow-r{font-size:.72rem;color:var(--text-muted)}
+
+.preview{
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:14px 16px;
+  font-family:'Courier New',monospace;
+  font-size:.81rem;
+  color:var(--text-muted);
+  min-height:48px;
+  word-break:break-all;
+  line-height:1.6;
+  transition:all .2s;
+}
+.preview.ready{color:var(--gold);border-color:var(--gold-dim);background:var(--gold-bg)}
+
+/* ——— BUTTON ——— */
+.btn{
+  width:100%;
+  background:var(--gold);
+  color:#0c0d0f;
+  border:none;
+  border-radius:var(--r);
+  padding:14px 24px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.05rem;letter-spacing:2.5px;
+  cursor:pointer;
+  transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:26px;
+}
+.btn:hover:not(:disabled){background:#d4b55a;transform:translateY(-1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed;transform:none}
+
+/* ——— STATUS ——— */
+.status{display:none;border-radius:var(--r);padding:16px 18px;font-size:.875rem;line-height:1.65;margin-top:16px}
+.status.show{display:block}
+.status.loading{background:rgba(201,168,76,.07);border:1px solid var(--gold-dim);color:var(--gold)}
+.status.ok{background:rgba(58,184,122,.07);border:1px solid rgba(58,184,122,.3);color:var(--success)}
+.status.warn{background:rgba(201,168,76,.07);border:1px solid var(--gold-dim);color:#d4b86a}
+
+.status a{color:inherit;text-decoration:underline;font-size:.82rem}
+
+@keyframes pulse{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.dot{display:inline-block;animation:pulse 1.4s infinite;margin:0 1px}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+
+/* ——— RESPONSIVE ——— */
+@media(max-width:520px){
+  .card{padding:22px 18px}
+  h1{font-size:2.2rem}
+  .row2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="pill">
+      <svg viewBox="0 0 24 24"><path d="M6 3v18M18 3v18M3 6l3-3 3 3M15 6l3-3 3 3"/></svg>
+      <span>The Barber Express</span>
+    </div>
+    <h1>Gestão de Documentos</h1>
+    <p>Envio centralizado de recibos, notas fiscais e contratos</p>
+  </header>
+
+  <div class="card">
+    <form id="form">
+
+      <div class="slabel">Unidade</div>
+      <div class="field">
+        <label>Selecione a unidade</label>
+        <div class="sw">
+          <select id="unit" required>
+            <option value="">— Escolha a unidade —</option>
+          </select>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <div class="slabel">Documento</div>
+      <div class="field">
+        <label>Tipo de documento</label>
+        <div class="sw">
+          <select id="docType" required>
+            <option value="">— Tipo de documento —</option>
+            <option value="RECIBO" data-folder="Recibos">Recibo</option>
+            <option value="NOTA_FISCAL" data-folder="Notas Fiscais">Nota Fiscal</option>
+            <option value="CONTRATO" data-folder="Contratos">Contrato</option>
+          </select>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <div class="slabel">Identificação</div>
+      <div class="row2">
+        <div class="field">
+          <label>Nome do Profissional</label>
+          <input type="text" id="prof" placeholder="Ex: João Silva" required>
+        </div>
+        <div class="field">
+          <label>Mês de referência</label>
+          <div class="sw">
+            <select id="month" required>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <div class="slabel">Arquivo</div>
+      <div class="field">
+        <div class="dz" id="dz">
+          <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx">
+          <span class="dz-icon" id="dzIcon">📎</span>
+          <p class="dz-text">
+            Arraste o arquivo aqui ou <em>clique para selecionar</em>
+            <span class="dz-hint">PDF · PNG · JPG · DOCX · XLSX</span>
+          </p>
+        </div>
+        <div class="finfo" id="finfo">
+          <span style="font-size:1rem">📄</span>
+          <span class="finfo-name" id="finfoName"></span>
+          <button type="button" class="finfo-rm" id="rmBtn" title="Remover">✕</button>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <div class="prow">
+        <span class="prow-l">Nome do arquivo gerado</span>
+        <span class="prow-r" id="drivePath"></span>
+      </div>
+      <div class="preview" id="preview">Preencha os campos acima para gerar o nome do arquivo</div>
+
+      <button type="submit" class="btn" id="submitBtn" disabled>
+        ⬆ Enviar Documento
+      </button>
+    </form>
+
+    <div class="status" id="status"></div>
+  </div>
+
+</div>
+<script>
+const ROOT_FOLDER='TBE - Documentos';
+const UNITS=[
+  {l:'The Barber Castanheira',s:'THE_BARBER_CASTANHEIRA'},
+  {l:'The Barber Express Benfica',s:'THE_BARBER_EXPRESS_BENFICA'},
+  {l:'The Barber Express Boa Vista',s:'THE_BARBER_EXPRESS_BOA_VISTA'},
+  {l:'The Barber Express Boa Vista 2',s:'THE_BARBER_EXPRESS_BOA_VISTA_2'},
+  {l:'The Barber Express Boulevard',s:'THE_BARBER_EXPRESS_BOULEVARD'},
+  {l:'The Barber Express Boavista SP',s:'THE_BARBER_EXPRESS_BOAVISTA_SP'},
+  {l:'The Barber Express Iandê',s:'THE_BARBER_EXPRESS_IANDE'},
+  {l:'The Barber Express Light',s:'THE_BARBER_EXPRESS_LIGHT'},
+  {l:'The Barber Express Marabá',s:'THE_BARBER_EXPRESS_MARABA'},
+  {l:'The Barber Express Metrópole',s:'THE_BARBER_EXPRESS_METROPOLE'},
+  {l:'The Barber Express Paragaba',s:'THE_BARBER_EXPRESS_PARAGABA'},
+  {l:'The Barber Express Parque',s:'THE_BARBER_EXPRESS_PARQUE'},
+  {l:'The Barber Express Pátio Belém',s:'THE_BARBER_EXPRESS_PATIO_BELEM'},
+  {l:'The Barber Express Pátio Norte',s:'THE_BARBER_EXPRESS_PATIO_NORTE'},
+  {l:'The Barber Express São Luís',s:'THE_BARBER_EXPRESS_SAO_LUIS'},
+  {l:'The Barber Express Tacaruna',s:'THE_BARBER_EXPRESS_TACARUNA'},
+  {l:'The Barber Express Tropical',s:'THE_BARBER_EXPRESS_TROPICAL'},
+  {l:'The Beauty Express',s:'THE_BEAUTY_EXPRESS'},
+];
+
+const $ = id => document.getElementById(id);
+const unitSel=$('unit'), dtSel=$('docType'), profIn=$('prof'), monthSel=$('month');
+const dz=$('dz'), fi=$('fileInput'), finfo=$('finfo'), finfoName=$('finfoName'), rmBtn=$('rmBtn');
+const preview=$('preview'), drivePath=$('drivePath'), submitBtn=$('submitBtn'), statusEl=$('status');
+
+const now=new Date();
+const YEAR=now.getFullYear();
+
+UNITS.forEach(u=>{
+  const o=document.createElement('option');
+  o.value=u.s; o.dataset.unitLabel=u.l; o.textContent=u.l;
+  unitSel.appendChild(o);
+});
+
+monthSel.value=String(now.getMonth()+1).padStart(2,'0');
+
+let file=null;
+
+function sanitize(str){
+  return str.trim().toUpperCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^A-Z0-9]+/g,'_')
+    .replace(/^_+|_+$/g,'');
+}
+
+function getFilename(){
+  const u=unitSel.value;
+  const dt=dtSel.value;
+  const p=profIn.value.trim();
+  const m=monthSel.value;
+  if(!u||!dt||!p||!file) return null;
+  const ext=file.name.split('.').pop().toLowerCase();
+  return `${u}_${sanitize(p)}_${dt}_${m}_${YEAR}.${ext}`;
+}
+
+function getInfo(){
+  const sel=unitSel.options[unitSel.selectedIndex];
+  const dsel=dtSel.options[dtSel.selectedIndex];
+  return{
+    unitLabel: sel?.dataset?.unitLabel||'',
+    folder: dsel?.dataset?.folder||''
+  };
+}
+
+function updatePreview(){
+  const fn=getFilename();
+  const {unitLabel,folder}=getInfo();
+  if(fn){
+    preview.textContent=fn;
+    preview.classList.add('ready');
+    drivePath.textContent=unitLabel&&folder?`📁 ${unitLabel} › ${folder}`:'';
+  } else {
+    preview.textContent='Preencha os campos acima para gerar o nome do arquivo';
+    preview.classList.remove('ready');
+    drivePath.textContent='';
+  }
+  submitBtn.disabled=!fn;
+}
+
+function setFile(f){
+  file=f;
+  dz.classList.add('filled');
+  finfoName.textContent=f.name;
+  finfo.classList.add('vis');
+  $('dzIcon').textContent='✅';
+  dz.querySelector('.dz-text').style.display='none';
+  updatePreview();
+}
+
+function clearFile(){
+  file=null; fi.value='';
+  dz.classList.remove('filled');
+  finfo.classList.remove('vis');
+  $('dzIcon').textContent='📎';
+  dz.querySelector('.dz-text').style.display='';
+  updatePreview();
+}
+
+fi.addEventListener('change',e=>{if(e.target.files[0])setFile(e.target.files[0])});
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0])});
+rmBtn.addEventListener('click',clearFile);
+[unitSel,dtSel,monthSel].forEach(el=>el.addEventListener('change',updatePreview));
+profIn.addEventListener('input',updatePreview);
+
+function setStatus(type,html){statusEl.className=`status show ${type}`;statusEl.innerHTML=html}
+function clearStatus(){statusEl.className='status';statusEl.innerHTML=''}
+
+function b64(f){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(',')[1]);
+    r.onerror=rej;
+    r.readAsDataURL(f);
+  });
+}
+
+async function tryDriveUpload(f,fname,unitLabel,folder){
+  const data=await b64(f);
+  const resp=await fetch('/upload',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      file:data,
+      mimeType:f.type||'application/octet-stream',
+      filename:fname,
+      unitLabel,
+      folder
+    })
+  });
+  const result=await resp.json();
+  if(!resp.ok||!result.success) throw new Error(result.error||`HTTP ${resp.status}`);
+  return result;
+}
+
+$('form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const fname=getFilename();
+  if(!fname||!file) return;
+  const {unitLabel,folder}=getInfo();
+  submitBtn.disabled=true;
+  setStatus('loading',`<span class="dot">•</span><span class="dot">•</span><span class="dot">•</span> Enviando para o Drive…`);
+
+  try{
+    const r=await tryDriveUpload(file,fname,unitLabel,folder);
+    setStatus('ok',`✅ <strong>Arquivo salvo no Drive!</strong><br>
+      <span style="opacity:.85">Nome: ${r.name||fname}</span><br>
+      <span style="opacity:.65;font-size:.8rem">📁 ${unitLabel} › ${folder}</span>
+      ${r.url?`<br><a href="${r.url}" target="_blank">Abrir no Drive ↗</a>`:''}
+    `);
+  } catch(err){
+    setStatus('warn',`⚠️ <strong>Erro ao enviar: ${err.message}</strong><br>
+      <span style="opacity:.8;font-size:.82rem">Verifique a configuração da service account no Netlify.</span>
+    `);
+  }
+
+  submitBtn.disabled=false;
+});
+</script>
+</body>
+</html>

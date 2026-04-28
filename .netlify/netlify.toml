@@ -1,0 +1,30 @@
+functionsDirectory = "C:\\Users\\luan_\\Documents\\6_THE\\Controle_Documentos\\netlify\\functions"
+functionsDirectoryOrigin = "config-v1"
+plugins = []
+headers = []
+redirects = []
+
+[build]
+publish = "C:\\Users\\luan_\\Documents\\6_THE\\Controle_Documentos"
+publishOrigin = "config"
+base = "C:\\Users\\luan_\\Documents\\6_THE\\Controle_Documentos"
+functions = "C:\\Users\\luan_\\Documents\\6_THE\\Controle_Documentos\\netlify\\functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[functions]
+
+[functions."*"]
+node_bundler = "nft"
