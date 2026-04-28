@@ -479,7 +479,7 @@ $('form').addEventListener('submit',async e=>{
     `);
   } catch(err){
     setStatus('warn',`⚠️ <strong>Erro ao enviar: ${err.message}</strong><br>
-      <span style="opacity:.8;font-size:.82rem">Verifique a configuração da service account no Netlify.</span>
+      <span style="opacity:.8;font-size:.82rem">Verifique as variáveis de ambiente no Cloudflare e a URL do Apps Script.</span>
     `);
   }
 
